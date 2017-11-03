@@ -1,6 +1,5 @@
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from scrapy.crawler import CrawlerProcess
 from scrapy import Item
 from scrapy import Field
 from logging import INFO
@@ -20,19 +19,19 @@ class Organomix(CrawlSpider):
     # por mais que alguma regra de pattern esteja furada
     allowed_domains = ['organomix.com.br']
     # Primeiramente testei com o start no menu principal. Funciona mas precisa rever a regra para perfomar melhor
-    # start_urls = ['https://www.organomix.com.br']
+    start_urls = ['https://www.organomix.com.br']
 
     # Daí decidi por, enquanto não azeito as regras, comecar o crawling pelas categorias fixas do site
-    start_urls = [
-        'https://www.organomix.com.br/horta---pomar',
-        'https://www.organomix.com.br/ovos---laticinios',
-        'https://www.organomix.com.br/carnes---pescados',
-        'https://www.organomix.com.br/bebidas',
-        'https://www.organomix.com.br/para-a-despensa',
-        'https://www.organomix.com.br/para-a-geladeira',
-        'https://www.organomix.com.br/para-a-casa',
-        'https://www.organomix.com.br/linha-pet'
-    ]
+    # start_urls = [
+    #     'https://www.organomix.com.br/horta---pomar',
+    #     'https://www.organomix.com.br/ovos---laticinios',
+    #     'https://www.organomix.com.br/carnes---pescados',
+    #     'https://www.organomix.com.br/bebidas',
+    #     'https://www.organomix.com.br/para-a-despensa',
+    #     'https://www.organomix.com.br/para-a-geladeira',
+    #     'https://www.organomix.com.br/para-a-casa',
+    #     'https://www.organomix.com.br/linha-pet'
+    # ]
 
     rules = [
         # Regra simples para entrar na subsessão (url contém =O). Pode melhorar
@@ -67,20 +66,3 @@ class JsonWriterPipeline(object):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
         return item
-
-
-# Configurando o Crawler
-process = CrawlerProcess(settings={
-    'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)',
-    # Nível máximo de crawling considerando que os start_urls são diretamente as categorias do supermercado
-    'DEPTH_LIMIT': 2,
-    'LOG_LEVEL': 'INFO',
-    'ITEM_PIPELINES': {
-        # Esse número é a prioridade de execucao do pipeline em questao, quanto menor será executado primeiro.
-        '__main__.JsonWriterPipeline': 1
-    }
-})
-
-# É hora do show!
-process.crawl(Organomix)
-process.start()
